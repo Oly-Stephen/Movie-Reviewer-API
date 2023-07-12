@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReviewDto {
 
+    private long id;
+
     private String body;
 
     private LocalDateTime created;

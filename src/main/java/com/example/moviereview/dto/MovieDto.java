@@ -1,7 +1,6 @@
 package com.example.moviereview.dto;
 
 import com.example.moviereview.entity.Review;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

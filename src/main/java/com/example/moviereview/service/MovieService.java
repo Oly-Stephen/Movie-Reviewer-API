@@ -8,12 +8,11 @@ import java.util.Optional;
 
 public interface MovieService {
 
-    List<MovieDto> getAllMovies();
-
     MovieDto createMovie(MovieDto movieDto);
+    List<MovieDto> getAllMovies();
+    Optional<MovieDto> getMovieByImdbId(String imdbId);
 
-
-//    Optional<MovieDto> findMovieByImdbId(String imdbId);
+    MovieDto getMovieById(long id);
 
 //    PostDto createPost(PostDto postDto);
 //

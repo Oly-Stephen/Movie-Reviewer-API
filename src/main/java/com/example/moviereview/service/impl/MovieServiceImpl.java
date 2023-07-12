@@ -2,6 +2,8 @@ package com.example.moviereview.service.impl;
 
 import com.example.moviereview.dto.MovieDto;
 import com.example.moviereview.entity.Movie;
+import com.example.moviereview.exception.ImbdException;
+import com.example.moviereview.exception.ResourceNotFoundException;
 import com.example.moviereview.repository.MovieRepository;
 import com.example.moviereview.service.MovieService;
 import org.modelmapper.ModelMapper;
@@ -24,6 +26,12 @@ public class MovieServiceImpl implements MovieService {
         this.modelMapper = modelMapper;
     }
 
+    @Override
+    public MovieDto createMovie(MovieDto movieDto) {
+        Movie movie = modelMapper.map(movieDto, Movie.class);
+        Movie savedMovie = movieRepository.save(movie);
+        return modelMapper.map(savedMovie, MovieDto.class);
+    }
 
     @Override
     public List<MovieDto> getAllMovies() {
@@ -34,14 +42,29 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieDto createMovie(MovieDto movieDto) {
-        Movie movie = modelMapper.map(movieDto, Movie.class);
-        Movie savedMovie = movieRepository.save(movie);
-        return modelMapper.map(savedMovie, MovieDto.class);
+    public Optional<MovieDto> getMovieByImdbId(String imdbId) {
+        Movie movie = movieRepository.findMovieByImdbId(imdbId)
+                .orElseThrow(()-> new ImbdException("Movie", "imdbId", imdbId));
+        return Optional.ofNullable(mapToDTO(movie));
     }
 
-//    @Override
-//    public Optional<MovieDto> findMovieByImdbId(String imdbId) {
-//        return movieRepository.findMovieByImdbId(imdbId);
-//    }
+    @Override
+    public MovieDto getMovieById(long id) {
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Movie", "id", id));
+        return mapToDTO(movie);
+    }
+
+
+    // Convert entity to DTO
+    private MovieDto mapToDTO(Movie movie){
+        MovieDto movieDto = modelMapper.map(movie, MovieDto.class);
+        return movieDto;
+    }
+
+    // convert DTO to entity
+    private Movie mapToEntity(MovieDto movieDto){
+        Movie movie = modelMapper.map(movieDto, Movie.class);
+        return movie;
+    }
 }

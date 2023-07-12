@@ -8,10 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/movies")
-public class MovieController {
+public class
+MovieController {
 
     private final MovieService movieService;
 
@@ -30,4 +32,18 @@ public class MovieController {
     public ResponseEntity<List<MovieDto>> getAllMovies(){
         return ResponseEntity.ok(movieService.getAllMovies());
     }
+
+    // get movie by id
+    @GetMapping("/movieId/{id}")
+    public ResponseEntity<MovieDto> getMovieById(@PathVariable(name = "id") long id){
+        return ResponseEntity.ok(movieService.getMovieById(id));
+    }
+
+    // get movie by imdbID
+    @GetMapping("/{imdbId}")
+    public ResponseEntity<Optional<MovieDto>> getMovieByImdbId(@PathVariable(name = "imdbId") String imdbId){
+        return ResponseEntity.ok(movieService.getMovieByImdbId(imdbId));
+    }
+
+
 }
