@@ -1,10 +1,12 @@
 package com.example.moviereview.controller;
 
 import com.example.moviereview.dto.MovieDto;
+import com.example.moviereview.dto.MovieResponse;
 import com.example.moviereview.service.MovieService;
+import com.example.moviereview.utils.AppConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,23 +29,20 @@ MovieController {
         return new ResponseEntity<>(savedMovie, HttpStatus.CREATED);
     }
 
-    // Build Get All Movies REST API
     @GetMapping
-    public ResponseEntity<List<MovieDto>> getAllMovies(){
-        return ResponseEntity.ok(movieService.getAllMovies());
+    //http://localhost:8080/api/v1/movies?pageNo=0&pageSize=10&sortBy=releaseDate&sortDir=asc
+    public MovieResponse getAllMovies(
+            @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIR, required = false) String sortDir
+    ){
+        return movieService.getAllMovies(pageNo, pageSize, sortBy, sortDir);
     }
 
     // get movie by id
-    @GetMapping("/movieId/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<MovieDto> getMovieById(@PathVariable(name = "id") long id){
         return ResponseEntity.ok(movieService.getMovieById(id));
     }
-
-    // get movie by imdbID
-    @GetMapping("/{imdbId}")
-    public ResponseEntity<Optional<MovieDto>> getMovieByImdbId(@PathVariable(name = "imdbId") String imdbId){
-        return ResponseEntity.ok(movieService.getMovieByImdbId(imdbId));
-    }
-
-
 }

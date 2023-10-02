@@ -36,13 +36,20 @@ public class ReviewServiceImpl implements ReviewService {
                 () -> new ResourceNotFoundException("Movie", "id", movieId));
 
         // set post to comment entity
-        review.setMovie(movie);
+        review.setBody(review.getBody());
         review.setCreated(LocalDateTime.now());
         review.setUpdated(LocalDateTime.now());
 
         // save comment entity in DB
         Review newReview = reviewRepository.save(review);
         return mapToDto(newReview);
+    }
+
+    @Override
+    public ReviewDto getReviewById(long id) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Review", "id", id));
+        return mapToDto(review);
     }
 
     // Convert entity to DTO

@@ -1,16 +1,19 @@
 package com.example.moviereview.service.impl;
 
 import com.example.moviereview.dto.MovieDto;
+import com.example.moviereview.dto.MovieResponse;
 import com.example.moviereview.entity.Movie;
-import com.example.moviereview.exception.ImbdException;
 import com.example.moviereview.exception.ResourceNotFoundException;
 import com.example.moviereview.repository.MovieRepository;
 import com.example.moviereview.service.MovieService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,18 +37,28 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<MovieDto> getAllMovies() {
+    public MovieResponse getAllMovies(int pageNo, int pageSize, String  sortBy, String sortDir) {
 
-        List<Movie> movies = movieRepository.findAll();
-        return movies.stream().map((movie) -> modelMapper.map(movie, MovieDto.class))
-                .collect(Collectors.toList());
-    }
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
 
-    @Override
-    public Optional<MovieDto> getMovieByImdbId(String imdbId) {
-        Movie movie = movieRepository.findMovieByImdbId(imdbId)
-                .orElseThrow(()-> new ImbdException("Movie", "imdbId", imdbId));
-        return Optional.ofNullable(mapToDTO(movie));
+        // create pageable instance
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+
+        Page<Movie> movies = movieRepository.findAll(pageable);
+
+        // get content for page object
+        List<Movie> listOfMovies = movies.getContent();
+
+        List<MovieDto> content = listOfMovies.stream().map(movie -> mapToDTO(movie)).collect(Collectors.toList());
+        MovieResponse movieResponse = new MovieResponse();
+        movieResponse.setContent(content);
+        movieResponse.setPageNo(movies.getNumber());
+        movieResponse.setPageSize((movies.getSize()));
+        movieResponse.setTotalElements(movies.getTotalElements());
+        movieResponse.setTotalPages(movies.getTotalPages());
+        movieResponse.setLast(movies.isLast());
+        return movieResponse;
     }
 
     @Override

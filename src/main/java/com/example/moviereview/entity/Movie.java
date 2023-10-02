@@ -3,7 +3,9 @@ package com.example.moviereview.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -31,6 +33,7 @@ public class Movie {
 
     private List<String> genres;
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviews;
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true) //orphanRemover remove child if parent is removed
+    // used set here instead of list because list allows duplicate but set does not
+    private Set<Review> reviews = new HashSet<>();
 }
